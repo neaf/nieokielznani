@@ -87,7 +87,7 @@ body {
     gap: 0.5rem;
 }
 
-.nav-menu a {
+.nav-menu a, .nav-menu span {
     text-decoration: none;
     color: var(--text-color);
     font-weight: 400;
@@ -100,9 +100,19 @@ body {
     touch-action: manipulation;
 }
 
+.nav-menu span {
+    color: var(--beige);
+}
+
 .nav-menu a:hover {
     color: var(--accent-green);
     background: var(--light-color);
+}
+
+.nav-menu a[href*="youtube"] svg {
+    vertical-align: middle;
+    position: relative;
+    top: -0.1em;
 }
 
 .mobile-menu-toggle {
@@ -256,6 +266,31 @@ section {
 
 .story-block {
     margin-bottom: 3rem;
+}
+
+.story-block a {
+    color: #668000;
+    text-decoration: underline;
+    text-decoration-color: rgba(102, 128, 0, 0.4);
+    text-underline-offset: 3px;
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+}
+
+.story-block a:hover {
+    color: #4d6000;
+    text-decoration-color: #4d6000;
+}
+
+.story-block a:visited {
+    color: #8b7355;
+}
+
+.story-block a:visited:hover {
+    color: #6b5d4f;
+}
+
+.story-block a:active {
+    color: #3a4800;
 }
 
 .story-block h3 {
