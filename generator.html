@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator postów — Nieokiełznani</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .gen-page {
+            padding: 4rem 0 6rem;
+        }
+
+        .gen-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+        }
+
+        .gen-header h1 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: var(--dark-green);
+            margin-bottom: 0.5rem;
+        }
+
+        .gen-header p {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .gen-grid {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 3rem;
+            align-items: start;
+        }
+
+        .gen-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .ctrl-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.6rem;
+        }
+
+        .quote-textarea {
+            width: 100%;
+            min-height: 180px;
+            padding: 1rem 1.2rem;
+            border: 1.5px solid var(--beige);
+            border-radius: 10px;
+            background: var(--white);
+            font-family: inherit;
+            font-size: 1.05rem;
+            line-height: 1.75;
+            color: var(--text-color);
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .quote-textarea:focus {
+            outline: none;
+            border-color: var(--accent-green);
+            box-shadow: 0 0 0 3px rgba(155, 138, 112, 0.12);
+        }
+
+
+
+        .format-hint {
+            margin-top: 0.6rem;
+            font-size: 0.82rem;
+            color: var(--gray);
+        }
+
+        .format-hint code {
+            background: var(--beige);
+            border-radius: 4px;
+            padding: 0.1em 0.4em;
+            font-size: 0.9em;
+        }
+
+        .font-size-ctrl {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .fs-btn {
+            width: 36px;
+            height: 36px;
+            border: 2px solid var(--beige);
+            border-radius: 8px;
+            background: none;
+            cursor: pointer;
+            font-size: 1.2rem;
+            line-height: 1;
+            color: var(--text-color);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .fs-btn:hover {
+            border-color: var(--accent-green);
+        }
+
+        .fs-display {
+            min-width: 52px;
+            text-align: center;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+        .fs-display.is-auto {
+            color: var(--gray);
+            font-weight: 400;
+        }
+
+        .fs-auto-label {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            margin-left: 0.5rem;
+            font-size: 0.88rem;
+            color: var(--gray);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .fs-auto-label input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: var(--cta-color);
+            cursor: pointer;
+        }
+
+        .dl-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: var(--cta-color);
+            color: var(--cream);
+            border: none;
+            border-radius: 25px;
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+
+        .dl-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .dl-hint {
+            font-size: 0.82rem;
+            color: var(--gray);
+            text-align: center;
+            margin-top: 0.5rem;
+            min-height: 1.2em;
+        }
+
+        .gen-preview {
+            position: sticky;
+            top: 88px;
+        }
+
+        .canvas-frame {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 40px rgba(139, 115, 85, 0.22),
+                        0 0 0 1px rgba(139, 115, 85, 0.1);
+        }
+
+        #post-canvas {
+            display: block;
+            width: 100%;
+            aspect-ratio: 3 / 4;
+        }
+
+        .preview-label {
+            text-align: center;
+            font-size: 0.8rem;
+            color: var(--gray);
+            margin-top: 0.75rem;
+        }
+
+        @media (max-width: 820px) {
+            .gen-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .gen-preview {
+                position: static;
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body id="top">
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo">
+                    <a href="index.html">
+                        <img src="nieokielznani.png" alt="Nieokiełznani" class="logo-image">
+                    </a>
+                </div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">← Strona główna</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main class="gen-page">
+        <div class="container">
+            <header class="gen-header">
+                <h1>Generator postów</h1>
+                <p>Grafika 1080&times;1440&thinsp;px gotowa na Instagram.</p>
+            </header>
+
+            <div class="gen-grid">
+                <div class="gen-controls">
+                    <div>
+                        <label class="ctrl-label" for="quote-input">Cytat</label>
+                        <textarea
+                            id="quote-input"
+                            class="quote-textarea"
+                            placeholder="Wpisz cytat…"
+                        >Nauka szczeniaka „siad" na smaczku, to jak uczyć 3-latka zapamiętywać wzory geometryczne licząc, że za 10 lat będzie dobry w matmę i przykładny do prac domowych.</textarea>
+                    </div>
+
+                    <div>
+                        <p class="format-hint">Formatowanie: <code>**bold**</code> &nbsp; <code>__underline__</code></p>
+                    </div>
+
+                    <div>
+                        <label class="ctrl-label">Rozmiar czcionki</label>
+                        <div class="font-size-ctrl">
+                            <button class="fs-btn" id="fs-down">−</button>
+                            <span class="fs-display" id="fs-display">50px</span>
+                            <button class="fs-btn" id="fs-up">+</button>
+                            <label class="fs-auto-label">
+                                <input type="checkbox" id="fs-auto">
+                                auto
+                            </label>
+                        </div>
+                    </div>
+
+                    <div>
+                        <button class="dl-btn" id="dl-btn">Pobierz PNG (1080&times;1440)</button>
+                        <p class="dl-hint" id="dl-hint"></p>
+                    </div>
+                </div>
+
+                <div class="gen-preview">
+                    <div class="canvas-frame">
+                        <canvas id="post-canvas" width="1080" height="1440"></canvas>
+                    </div>
+                    <p class="preview-label">Podgląd w skali &middot; 1080&times;1440&thinsp;px</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('post-canvas');
+        const ctx = canvas.getContext('2d');
+        const W = 1080, H = 1440;
+
+        const S = {
+            bgTop:   '#faf8f5',
+            bgBot:   '#f0ebe4',
+            frame:   '#ddd6ce',
+            quote:   '#4a423a',
+            divider: '#c4b5a0',
+            handle:  '#9b8a70',
+        };
+
+        const faviconImg = new Image();
+        faviconImg.src = 'favicon.png';
+        faviconImg.onload = render;
+
+        let fontSizeOverride = 50; // px; null = auto
+
+        // ── Markdown tokeniser ──────────────────────────────────────────────
+        // Splits a line into word-level tokens preserving bold/underline state.
+        // Each token: { word: string, bold: bool, underline: bool, space: bool }
+        // `space` = should a space be prepended when joining onto a line.
+        function tokenizeLine(line) {
+            // First break the line into styled chunks, then split each chunk into words.
+            const chunks = [];
+            const re = /(\*\*[\s\S]+?\*\*|__[\s\S]+?__)/g;
+            let last = 0, m;
+            while ((m = re.exec(line)) !== null) {
+                if (m.index > last) chunks.push({ text: line.slice(last, m.index), bold: false, underline: false });
+                if (m[0].startsWith('**')) chunks.push({ text: m[0].slice(2, -2), bold: true,  underline: false });
+                else                       chunks.push({ text: m[0].slice(2, -2), bold: false, underline: true });
+                last = m.index + m[0].length;
+            }
+            if (last < line.length) chunks.push({ text: line.slice(last), bold: false, underline: false });
+
+            const tokens = [];
+            for (const chunk of chunks) {
+                const words = chunk.text.split(' ');
+                for (let i = 0; i < words.length; i++) {
+                    if (words[i] === '') continue;
+                    tokens.push({ word: words[i], bold: chunk.bold, underline: chunk.underline });
+                }
+            }
+            return tokens;
+        }
+
+        function spanFont(bold, fs) {
+            return `${bold ? '700' : '400'} ${fs}px Georgia, "Times New Roman", serif`;
+        }
+
+        function measureToken(tok, fs) {
+            ctx.font = spanFont(tok.bold, fs);
+            return ctx.measureText(tok.word).width;
+        }
+
+        function measureSpace(fs) {
+            ctx.font = spanFont(false, fs);
+            return ctx.measureText(' ').width;
+        }
+
+        // Wraps tokenized line into display rows; each row is an array of tokens
+        // annotated with whether a space precedes them.
+        function wrapTokens(tokens, fs, maxW) {
+            const rows = [];
+            let row = [], rowW = 0;
+            for (const tok of tokens) {
+                const tw = measureToken(tok, fs);
+                const spaceW = row.length ? measureSpace(fs) : 0;
+                const isPunct = /^[,\.!?;:…”’)]/.test(tok.word);
+                const needsSpace = row.length > 0 && !isPunct;
+                const effectiveSpaceW = needsSpace ? spaceW : 0;
+                if (row.length && rowW + effectiveSpaceW + tw > maxW) {
+                    rows.push(row);
+                    row = [{ ...tok, prependSpace: false }];
+                    rowW = tw;
+                } else {
+                    row.push({ ...tok, prependSpace: needsSpace });
+                    rowW += effectiveSpaceW + tw;
+                }
+            }
+            if (row.length) rows.push(row);
+            return rows.length ? rows : [[]];
+        }
+
+        // Build all display segments from the full textarea text.
+        // Each segment: { tokens: [...], isBreak: bool }
+        function buildSegments(text, fs, maxW) {
+            const paragraphs = text.split(/\n{2,}/);
+            const result = [];
+            paragraphs.forEach((para, pi) => {
+                const hardLines = para.split('\n');
+                hardLines.forEach(hard => {
+                    const trimmed = hard.trim();
+                    if (!trimmed) {
+                        result.push({ tokens: [], isBreak: false });
+                        return;
+                    }
+                    const tokens = tokenizeLine(trimmed);
+                    const rows   = wrapTokens(tokens, fs, maxW);
+                    rows.forEach(r => result.push({ tokens: r, isBreak: false }));
+                });
+                if (pi < paragraphs.length - 1 && result.length > 0) {
+                    result[result.length - 1].isBreak = true;
+                }
+            });
+            return result;
+        }
+
+        function totalTextHeight(fs, segs) {
+            const lh = fs * 1.55, paraGap = fs * 1.4;
+            return segs.reduce((h, seg, i) => {
+                h += lh;
+                if (seg.isBreak && i < segs.length - 1) h += paraGap;
+                return h;
+            }, 0);
+        }
+
+        // Draw one row of tokens at canvas position (x, y).
+        // x = center-x for center align, left edge for left align.
+        function drawRow(tokens, x, y, fs, align) {
+            if (!tokens.length) return;
+
+            // Measure total row width for centering
+            let rowW = 0;
+            for (const tok of tokens) {
+                if (tok.prependSpace) rowW += measureSpace(fs);
+                rowW += measureToken(tok, fs);
+            }
+
+            let cx = align === 'center' ? x - rowW / 2 : x;
+
+            for (let ti = 0; ti < tokens.length; ti++) {
+                const tok = tokens[ti];
+                const spW = tok.prependSpace ? measureSpace(fs) : 0;
+                if (tok.prependSpace) cx += spW;
+                ctx.font         = spanFont(tok.bold, fs);
+                ctx.textAlign    = 'left';
+                ctx.textBaseline = 'top';
+                ctx.fillStyle    = S.quote;
+                ctx.fillText(tok.word, cx, y);
+                const tw = measureToken(tok, fs);
+                if (tok.underline) {
+                    const uy    = y + fs * 1.08;
+                    const thick = Math.max(1, fs * 0.045);
+                    // bridge back into the preceding space only when the previous token was also underlined
+                    const prevTok = tokens[ti - 1];
+                    const backW = (prevTok && prevTok.underline && tok.prependSpace) ? spW : 0;
+                    ctx.fillStyle = S.quote;
+                    ctx.fillRect(cx - backW, uy, backW + tw, thick);
+                }
+                cx += tw;
+            }
+        }
+
+        // ── Auto font-size calculation ──────────────────────────────────────
+        function calcAutoFontSize(text, maxW, zoneH) {
+            let fs = 80;
+            while (fs >= 36) {
+                const segs = buildSegments(text, fs, maxW);
+                if (totalTextHeight(fs, segs) <= zoneH * 0.88) break;
+                fs -= 3;
+            }
+            return fs;
+        }
+
+        // ── Main draw ───────────────────────────────────────────────────────
+        function drawPost(quote) {
+            const grad = ctx.createLinearGradient(0, 0, 0, H);
+            grad.addColorStop(0, S.bgTop);
+            grad.addColorStop(1, S.bgBot);
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, 0, W, H);
+
+            ctx.strokeStyle = S.frame;
+            ctx.lineWidth = 2;
+            ctx.strokeRect(44, 44, W - 88, H - 88);
+
+            // ── Bottom branding cluster ─────────────────────────────────────
+            // Layout (bottom-up): handle → gap → rule → gap → favicon circle
+            const handleY   = H - 100;
+            const ruleY     = handleY - 52;
+            const faviconD  = 120;
+            const faviconCY = ruleY - 36 - faviconD / 2;
+            const rowCY     = faviconCY; // alias used by zone calc below
+
+            // Favicon circle (clipped to circle)
+            if (faviconImg.complete && faviconImg.naturalWidth) {
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(W / 2, faviconCY, faviconD / 2, 0, Math.PI * 2);
+                ctx.clip();
+                ctx.drawImage(faviconImg, W / 2 - faviconD / 2, faviconCY - faviconD / 2, faviconD, faviconD);
+                ctx.restore();
+            }
+
+            // Rule
+            ctx.fillStyle = S.divider;
+            ctx.fillRect(W / 2 - 30, ruleY, 60, 1.5);
+
+            // Handle
+            ctx.save();
+            ctx.textAlign    = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle    = S.handle;
+            ctx.font         = '300 32px Arial, Helvetica, sans-serif';
+            ctx.letterSpacing = '3px';
+            ctx.fillText('@nieokielznani', W / 2 + 1, handleY);
+            ctx.letterSpacing = '0px';
+            ctx.restore();
+
+            // ── Quote zone ──────────────────────────────────────────────────
+            const zoneTop    = 100;
+            const zoneBottom = faviconCY - faviconD / 2 - 60;
+            const zoneH      = zoneBottom - zoneTop;
+            const margin     = 130;
+            const maxW       = W - margin * 2;
+
+            const fontSize = fontSizeOverride !== null
+                ? fontSizeOverride
+                : calcAutoFontSize(quote, maxW, zoneH);
+
+            const segments = buildSegments(quote, fontSize, maxW);
+            const lh       = fontSize * 1.55;
+            const paraGap  = fontSize * 1.4;
+            const totalH   = totalTextHeight(fontSize, segments);
+            let y = zoneTop + (zoneH - totalH) / 2;
+
+            segments.forEach((seg, i) => {
+                drawRow(seg.tokens, margin, y, fontSize, 'left');
+                y += lh;
+                if (seg.isBreak && i < segments.length - 1) y += paraGap;
+            });
+        }
+
+        // ── UI helpers ──────────────────────────────────────────────────────
+        const fsDisplay  = document.getElementById('fs-display');
+        const fsAutoChk  = document.getElementById('fs-auto');
+        const fsUpBtn    = document.getElementById('fs-up');
+        const fsDownBtn  = document.getElementById('fs-down');
+
+        function updateFsDisplay() {
+            if (fontSizeOverride === null) {
+                fsDisplay.textContent = 'auto';
+                fsDisplay.classList.add('is-auto');
+                fsUpBtn.disabled   = true;
+                fsDownBtn.disabled = true;
+            } else {
+                fsDisplay.textContent = fontSizeOverride + 'px';
+                fsDisplay.classList.remove('is-auto');
+                fsUpBtn.disabled   = false;
+                fsDownBtn.disabled = false;
+            }
+        }
+
+        fsAutoChk.addEventListener('change', () => {
+            if (fsAutoChk.checked) {
+                fontSizeOverride = null;
+            } else {
+                // restore last manual size when unchecking
+                fontSizeOverride = parseInt(fsDisplay.textContent) || 50;
+            }
+            updateFsDisplay();
+            render();
+        });
+
+        document.getElementById('fs-up').addEventListener('click', () => {
+            if (fontSizeOverride === null) return;
+            fontSizeOverride = Math.min(fontSizeOverride + 3, 160);
+            updateFsDisplay();
+            render();
+        });
+
+        document.getElementById('fs-down').addEventListener('click', () => {
+            if (fontSizeOverride === null) return;
+            fontSizeOverride = Math.max(fontSizeOverride - 3, 24);
+            updateFsDisplay();
+            render();
+        });
+
+        function render() {
+            const quote = document.getElementById('quote-input').value.trim() || '…';
+            drawPost(quote);
+        }
+
+        const quoteInput = document.getElementById('quote-input');
+
+        const saved = localStorage.getItem('nk-quote');
+        if (saved !== null) quoteInput.value = saved;
+
+        quoteInput.addEventListener('input', () => {
+            localStorage.setItem('nk-quote', quoteInput.value);
+            render();
+        });
+
+        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+        if (isIOS) {
+            document.getElementById('dl-hint').textContent =
+                'Na iOS: naciśnij przycisk, a następnie przytrzymaj obraz, by zapisać.';
+        }
+
+        document.getElementById('dl-btn').addEventListener('click', () => {
+            if (isIOS) {
+                window.open(canvas.toDataURL('image/png'), '_blank');
+            } else {
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.download = `nieokielznani-post-${Date.now()}.png`;
+                    a.href = url;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            }
+        });
+
+        render();
+    </script>
+</body>
+</html>
