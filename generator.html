@@ -591,19 +591,22 @@
             render();
         });
 
-        const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-        if (isIOS) {
+        if (isMobile) {
+            document.getElementById('dl-btn').textContent = 'Otwórz obraz (zapisz przytrzymując)';
             document.getElementById('dl-hint').textContent =
-                'Na iOS: naciśnij przycisk, a następnie przytrzymaj obraz, by zapisać.';
+                'Przytrzymaj obraz → Zapisz do Zdjęć lub Kopiuj';
         }
 
         document.getElementById('dl-btn').addEventListener('click', () => {
-            if (isIOS) {
-                window.open(canvas.toDataURL('image/png'), '_blank');
-            } else {
-                canvas.toBlob(blob => {
-                    const url = URL.createObjectURL(blob);
+            canvas.toBlob(blob => {
+                const url = URL.createObjectURL(blob);
+                if (isMobile) {
+                    window.open(url, '_blank');
+                    // blob URL is short-lived but enough for the new tab to load
+                    setTimeout(() => URL.revokeObjectURL(url), 10000);
+                } else {
                     const a = document.createElement('a');
                     a.download = `nieokielznani-post-${Date.now()}.png`;
                     a.href = url;
@@ -611,8 +614,8 @@
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
-                }, 'image/png');
-            }
+                }
+            }, 'image/png');
         });
 
         render();
