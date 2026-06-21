@@ -535,14 +535,18 @@
             }
         }
 
+        function saveSettings() {
+            localStorage.setItem('nk-fs', fontSizeOverride === null ? 'auto' : fontSizeOverride);
+        }
+
         fsAutoChk.addEventListener('change', () => {
             if (fsAutoChk.checked) {
                 fontSizeOverride = null;
             } else {
-                // restore last manual size when unchecking
                 fontSizeOverride = parseInt(fsDisplay.textContent) || 50;
             }
             updateFsDisplay();
+            saveSettings();
             render();
         });
 
@@ -550,6 +554,7 @@
             if (fontSizeOverride === null) return;
             fontSizeOverride = Math.min(fontSizeOverride + 3, 160);
             updateFsDisplay();
+            saveSettings();
             render();
         });
 
@@ -557,6 +562,7 @@
             if (fontSizeOverride === null) return;
             fontSizeOverride = Math.max(fontSizeOverride - 3, 24);
             updateFsDisplay();
+            saveSettings();
             render();
         });
 
@@ -567,8 +573,18 @@
 
         const quoteInput = document.getElementById('quote-input');
 
-        const saved = localStorage.getItem('nk-quote');
-        if (saved !== null) quoteInput.value = saved;
+        // Restore persisted state
+        const savedQuote = localStorage.getItem('nk-quote');
+        if (savedQuote !== null) quoteInput.value = savedQuote;
+
+        const savedFs = localStorage.getItem('nk-fs');
+        if (savedFs === 'auto') {
+            fontSizeOverride = null;
+            fsAutoChk.checked = true;
+        } else if (savedFs !== null) {
+            fontSizeOverride = parseInt(savedFs) || 50;
+        }
+        updateFsDisplay();
 
         quoteInput.addEventListener('input', () => {
             localStorage.setItem('nk-quote', quoteInput.value);
