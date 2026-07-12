@@ -110,7 +110,7 @@ body {
     background: var(--light-color);
 }
 
-.nav-menu a[href*="youtube"] svg {
+.nav-menu a svg {
     vertical-align: middle;
     position: relative;
     top: -0.1em;
