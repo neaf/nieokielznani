@@ -144,10 +144,18 @@ document.querySelectorAll('.story-block').forEach(block => {
   const allVideos = document.querySelectorAll('.skills-img-card:not(.skills-img-clone) video');
   let soundEnabled = false;
 
+  let carouselVisible = false;
+
+  const carouselObserver = new IntersectionObserver((entries) => {
+    carouselVisible = entries[0].isIntersecting;
+    syncVideoAudio();
+  }, { threshold: 0.1 });
+  carouselObserver.observe(document.querySelector('.skills-carousel-images'));
+
   function syncVideoAudio() {
     allVideos.forEach((v, i) => {
-      v.muted = !(soundEnabled && i === current);
-      if (i === current) { v.play(); } else { v.pause(); }
+      v.muted = !(soundEnabled && i === current && carouselVisible);
+      if (i === current && carouselVisible) { v.play(); } else { v.pause(); }
     });
   }
 
