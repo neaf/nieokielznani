@@ -73,5 +73,75 @@ document.querySelectorAll('.story-block').forEach(block => {
 });
 
 
+// Skills carousel
+(function () {
+  const textPanels = document.querySelectorAll('.skills-text-panel');
+  const imgCards = document.querySelectorAll('.skills-img-card:not(.skills-img-clone)');
+  const strip = document.getElementById('skills-strip');
+  const dotsContainer = document.getElementById('skills-dots');
+  const prevBtn = document.getElementById('skills-prev');
+  const nextBtn = document.getElementById('skills-next');
+  if (!textPanels.length || !strip) return;
+
+  const count = textPanels.length;
+  let current = 0;
+
+  const dots = Array.from(textPanels).map((_, i) => {
+    const dot = document.createElement('button');
+    dot.className = 'skills-dot' + (i === 0 ? ' active' : '');
+    dot.setAttribute('aria-label', 'Slajd ' + (i + 1));
+    dot.addEventListener('click', () => goTo(i));
+    dotsContainer.appendChild(dot);
+    return dot;
+  });
+
+  function snapTo(index) {
+    const cardWidth = imgCards[0].offsetWidth;
+    strip.style.transition = 'none';
+    strip.style.transform = 'translateX(-' + (index * cardWidth) + 'px)';
+    strip.getBoundingClientRect();
+    strip.style.transition = '';
+  }
+
+  function animateTo(index) {
+    const cardWidth = imgCards[0].offsetWidth;
+    strip.style.transform = 'translateX(-' + (index * cardWidth) + 'px)';
+  }
+
+  function updateUI(next) {
+    textPanels[current].classList.remove('active');
+    imgCards[current].classList.remove('active');
+    dots[current].classList.remove('active');
+    current = next;
+    textPanels[current].classList.add('active');
+    imgCards[current].classList.add('active');
+    dots[current].classList.add('active');
+  }
+
+  function goTo(index) {
+
+    const next = (index + count) % count;
+    const forwardWrap = index >= count;
+    const backwardWrap = index < 0;
+
+    updateUI(next);
+
+    if (forwardWrap) {
+      // animate rightward: strip sweeps back to 0, card 0 enters from left
+      animateTo(0);
+    } else if (backwardWrap) {
+      // snap to last, no clean way to animate without a second clone
+      snapTo(count - 1);
+    } else {
+      animateTo(next);
+    }
+  }
+
+  imgCards[0].classList.add('active');
+  snapTo(0);
+  prevBtn.addEventListener('click', () => goTo(current - 1));
+  nextBtn.addEventListener('click', () => goTo(current + 1));
+})();
+
 // Log message for debugging
 console.log('Real Dog Training - Site loaded. If you\'re reading this, I hope you find what you\'re looking for. 💚');
