@@ -116,6 +116,7 @@ document.querySelectorAll('.story-block').forEach(block => {
     textPanels[current].classList.add('active');
     imgCards[current].classList.add('active');
     dots[current].classList.add('active');
+    syncVideoAudio();
   }
 
   function goTo(index) {
@@ -137,10 +138,32 @@ document.querySelectorAll('.story-block').forEach(block => {
     }
   }
 
+  const soundBtn = document.getElementById('skills-sound-btn');
+  const iconOff = soundBtn.querySelector('.skills-sound-icon--off');
+  const iconOn = soundBtn.querySelector('.skills-sound-icon--on');
+  const allVideos = document.querySelectorAll('.skills-img-card:not(.skills-img-clone) video');
+  let soundEnabled = false;
+
+  function syncVideoAudio() {
+    allVideos.forEach((v, i) => {
+      v.muted = !(soundEnabled && i === current);
+      if (i === current) { v.play(); } else { v.pause(); }
+    });
+  }
+
+  soundBtn.addEventListener('click', () => {
+    soundEnabled = !soundEnabled;
+    syncVideoAudio();
+    iconOff.style.display = soundEnabled ? 'none' : '';
+    iconOn.style.display = soundEnabled ? '' : 'none';
+    soundBtn.setAttribute('aria-label', soundEnabled ? 'Wycisz' : 'Włącz dźwięk');
+  });
+
   imgCards[0].classList.add('active');
   snapTo(0);
   prevBtn.addEventListener('click', () => goTo(current - 1));
   nextBtn.addEventListener('click', () => goTo(current + 1));
+  syncVideoAudio();
 })();
 
 // Log message for debugging
