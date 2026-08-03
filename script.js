@@ -155,7 +155,7 @@ document.querySelectorAll('.story-block').forEach(block => {
   function syncVideoAudio() {
     allVideos.forEach((v, i) => {
       v.muted = !(soundEnabled && i === current && carouselVisible);
-      if (i === current && carouselVisible) { v.play(); } else { v.pause(); }
+      if (i === current && carouselVisible) { v.play().catch(() => {}); } else { v.pause(); }
     });
   }
 
@@ -165,6 +165,10 @@ document.querySelectorAll('.story-block').forEach(block => {
     iconOff.style.display = soundEnabled ? 'none' : '';
     iconOn.style.display = soundEnabled ? '' : 'none';
     soundBtn.setAttribute('aria-label', soundEnabled ? 'Wycisz' : 'Włącz dźwięk');
+  });
+
+  allVideos.forEach(v => {
+    v.addEventListener('loadedmetadata', () => { v.currentTime = 0.001; });
   });
 
   imgCards[0].classList.add('active');
