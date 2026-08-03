@@ -90,7 +90,7 @@ document.querySelectorAll('.story-block').forEach(block => {
     const dot = document.createElement('button');
     dot.className = 'skills-dot' + (i === 0 ? ' active' : '');
     dot.setAttribute('aria-label', 'Slajd ' + (i + 1));
-    dot.addEventListener('click', () => goTo(i));
+    dot.addEventListener('click', () => { autoAdvance = false; goTo(i); });
     dotsContainer.appendChild(dot);
     return dot;
   });
@@ -143,6 +143,13 @@ document.querySelectorAll('.story-block').forEach(block => {
   const iconOn = soundBtn.querySelector('.skills-sound-icon--on');
   const allVideos = document.querySelectorAll('.skills-img-card:not(.skills-img-clone) video');
   let soundEnabled = false;
+  let autoAdvance = true;
+
+  allVideos.forEach((v, i) => {
+    v.addEventListener('ended', () => {
+      if (autoAdvance && i === current) goTo(current + 1);
+    });
+  });
 
   let carouselVisible = false;
 
@@ -173,8 +180,8 @@ document.querySelectorAll('.story-block').forEach(block => {
 
   imgCards[0].classList.add('active');
   snapTo(0);
-  prevBtn.addEventListener('click', () => goTo(current - 1));
-  nextBtn.addEventListener('click', () => goTo(current + 1));
+  prevBtn.addEventListener('click', () => { autoAdvance = false; goTo(current - 1); });
+  nextBtn.addEventListener('click', () => { autoAdvance = false; goTo(current + 1); });
   syncVideoAudio();
 })();
 
