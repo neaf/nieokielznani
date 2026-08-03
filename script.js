@@ -167,7 +167,7 @@ document.querySelectorAll('.story-block').forEach(block => {
     soundBtn.setAttribute('aria-label', soundEnabled ? 'Wycisz' : 'Włącz dźwięk');
   });
 
-  allVideos.forEach(v => {
+  document.querySelectorAll('.skills-img-card video').forEach(v => {
     v.addEventListener('loadedmetadata', () => { v.currentTime = 0.001; });
   });
 
