@@ -182,6 +182,17 @@ document.querySelectorAll('.story-block').forEach(block => {
   snapTo(0);
   prevBtn.addEventListener('click', () => { autoAdvance = false; goTo(current - 1); });
   nextBtn.addEventListener('click', () => { autoAdvance = false; goTo(current + 1); });
+
+  let touchStartX = 0;
+  const carouselInner = document.querySelector('.skills-carousel-inner');
+  carouselInner.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+  carouselInner.addEventListener('touchend', (e) => {
+    const diff = touchStartX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) < 40) return;
+    autoAdvance = false;
+    goTo(diff > 0 ? current + 1 : current - 1);
+  }, { passive: true });
+
   syncVideoAudio();
 })();
 
