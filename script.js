@@ -134,12 +134,6 @@ navLinks.forEach(link => {
     soundBtn.setAttribute('aria-label', soundEnabled ? 'Wycisz' : 'Włącz dźwięk');
   });
 
-  document.querySelectorAll('.skills-img-card video').forEach(v => {
-    const showFirstFrame = () => { v.play().then(() => v.pause()).catch(() => {}); };
-    if (v.readyState >= 3) { showFirstFrame(); }
-    else { v.addEventListener('canplay', showFirstFrame, { once: true }); }
-  });
-
   imgCards[0].classList.add('active');
   snapTo(0);
   prevBtn.addEventListener('click', () => { autoAdvance = false; goTo(current - 1); });
