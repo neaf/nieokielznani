@@ -135,7 +135,7 @@ navLinks.forEach(link => {
   });
 
   document.querySelectorAll('.skills-img-card video').forEach(v => {
-    v.addEventListener('loadedmetadata', () => { v.currentTime = 0.001; });
+    v.addEventListener('loadeddata', () => { v.currentTime = 0.001; });
   });
 
   imgCards[0].classList.add('active');
