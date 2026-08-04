@@ -31,46 +31,6 @@ navLinks.forEach(link => {
 });
 
 
-// Add scroll reveal animation for service cards
-const observerOptions = {
-    threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            entry.target.style.animation = 'fadeInUp 0.6s ease forwards';
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-// Add fade-in animation CSS
-const animationStyle = document.createElement('style');
-animationStyle.textContent = `
-    @keyframes fadeInUp {
-        from {
-            opacity: 0;
-            transform: translateY(30px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-    
-    .story-block {
-        opacity: 0;
-    }
-`;
-document.head.appendChild(animationStyle);
-
-
-// Observe all story blocks
-document.querySelectorAll('.story-block').forEach(block => {
-    observer.observe(block);
-});
 
 
 // Skills carousel

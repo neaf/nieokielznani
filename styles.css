@@ -329,6 +329,10 @@ section {
     margin-bottom: 3rem;
 }
 
+.story-block:last-child {
+    margin-bottom: 0;
+}
+
 .link-yt-icon {
     width: 14px;
     height: 14px;
@@ -373,6 +377,10 @@ section {
     line-height: 1.9;
     color: var(--text-color);
     margin-bottom: 1.5rem;
+}
+
+.story-block > p:last-child {
+    margin-bottom: 0;
 }
 
 .story-block ul {
@@ -440,7 +448,7 @@ section {
     text-align: center;
     color: var(--muted);
     font-size: 1.5rem;
-    margin: 4rem 0;
+    margin: 3rem 0;
     letter-spacing: 1rem;
 }
 
@@ -965,6 +973,10 @@ section {
         color: var(--accent);
     }
 
+    .hero {
+        padding: 0;
+    }
+
     .container-narrow {
         padding: 0 20px;
     }
@@ -1032,6 +1044,6 @@ section {
     }
 
     .story-divider {
-        margin: 3rem 0;
+        margin: 2rem 0;
     }
 }
