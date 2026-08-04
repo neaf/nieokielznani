@@ -184,11 +184,38 @@ document.querySelectorAll('.story-block').forEach(block => {
   nextBtn.addEventListener('click', () => { autoAdvance = false; goTo(current + 1); });
 
   let touchStartX = 0;
+  let touchStartY = 0;
+  let dragBaseOffset = 0;
+  let gestureDir = null;
+  let isDragging = false;
   const carouselInner = document.querySelector('.skills-carousel-inner');
-  carouselInner.addEventListener('touchstart', (e) => { touchStartX = e.changedTouches[0].clientX; }, { passive: true });
+
+  carouselInner.addEventListener('touchstart', (e) => {
+    touchStartX = e.changedTouches[0].clientX;
+    touchStartY = e.changedTouches[0].clientY;
+    dragBaseOffset = -(current * imgCards[0].offsetWidth);
+    gestureDir = null;
+    isDragging = false;
+  }, { passive: true });
+
+  carouselInner.addEventListener('touchmove', (e) => {
+    const dx = e.changedTouches[0].clientX - touchStartX;
+    const dy = e.changedTouches[0].clientY - touchStartY;
+    if (!gestureDir && (Math.abs(dx) > 5 || Math.abs(dy) > 5)) {
+      gestureDir = Math.abs(dx) > Math.abs(dy) ? 'h' : 'v';
+    }
+    if (gestureDir !== 'h') return;
+    e.preventDefault();
+    isDragging = true;
+    strip.style.transition = 'none';
+    strip.style.transform = 'translateX(' + (dragBaseOffset + dx) + 'px)';
+  }, { passive: false });
+
   carouselInner.addEventListener('touchend', (e) => {
+    if (!isDragging) return;
     const diff = touchStartX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) < 40) return;
+    strip.style.transition = '';
+    if (Math.abs(diff) < 40) { animateTo(current); return; }
     autoAdvance = false;
     goTo(diff > 0 ? current + 1 : current - 1);
   }, { passive: true });
