@@ -547,7 +547,7 @@ section {
   background: var(--cream);
 }
 
-.program-stage:first-child {
+.program-stage:first-of-type {
   border-radius: 12px 12px 0 0;
 }
 
