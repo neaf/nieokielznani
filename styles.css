@@ -847,6 +847,7 @@ section {
   display: flex;
   height: 100%;
   transition: transform 0.45s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform;
 }
 
 .skills-img-card {
@@ -856,6 +857,7 @@ section {
   transition: filter 0.45s ease, opacity 0.45s ease;
   filter: blur(3px);
   opacity: 0.45;
+  will-change: filter, opacity;
 }
 
 .skills-img-card.active {
