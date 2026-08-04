@@ -109,6 +109,10 @@ navLinks.forEach(link => {
     v.addEventListener('ended', () => {
       if (autoAdvance && i === current) goTo(current + 1);
     });
+    v.addEventListener('playing', () => {
+      const poster = v.nextElementSibling;
+      if (poster) poster.classList.add('hidden');
+    });
   });
 
   let carouselVisible = false;

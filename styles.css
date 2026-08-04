@@ -867,6 +867,16 @@ section {
   pointer-events: none;
 }
 
+.skills-poster {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.2s ease;
+}
+
+.skills-poster.hidden {
+  opacity: 0;
+}
+
 /* Contact Section */
 .program {
     background: var(--light-color);
