@@ -191,8 +191,8 @@ console.log('Real Dog Training - Site loaded. If you\'re reading this, I hope yo
 // Analytics
 (function () {
   function track(name, params) {
-    if (typeof gtag !== 'function') return;
-    gtag('event', name, params || {});
+    if (typeof gtag === 'function') gtag('event', name, params || {});
+    if (typeof fbq === 'function') fbq('trackCustom', name, params || {});
   }
 
   // 1. Scroll depth (25 / 50 / 75 / 100%)
