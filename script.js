@@ -185,3 +185,99 @@ navLinks.forEach(link => {
 
 // Log message for debugging
 console.log('Real Dog Training - Site loaded. If you\'re reading this, I hope you find what you\'re looking for. 💚');
+
+
+
+// Analytics
+(function () {
+  function track(name, params) {
+    if (typeof gtag !== 'function') return;
+    gtag('event', name, params || {});
+  }
+
+  // 1. Scroll depth (25 / 50 / 75 / 100%)
+  var depthFired = new Set();
+  window.addEventListener('scroll', function () {
+    var scrolled = window.scrollY + window.innerHeight;
+    var total = document.documentElement.scrollHeight;
+    var pct = Math.floor((scrolled / total) * 100);
+    [25, 50, 75, 100].forEach(function (milestone) {
+      if (pct >= milestone && !depthFired.has(milestone)) {
+        depthFired.add(milestone);
+        track('scroll_depth', { depth: milestone });
+      }
+    });
+  }, { passive: true });
+
+  // 2. Section visibility
+  var sectionMap = [
+    { selector: '#story', name: 'story' },
+    { selector: '#program', name: 'program' },
+    { selector: '#contact', name: 'contact' },
+  ];
+  var sectionObserver = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) {
+        track('section_viewed', { section_name: entry.target.dataset.analyticsSection });
+        sectionObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  sectionMap.forEach(function (s) {
+    var el = document.querySelector(s.selector);
+    if (!el) return;
+    el.dataset.analyticsSection = s.name;
+    sectionObserver.observe(el);
+  });
+
+  // 3. Hero CTA click
+  var heroCta = document.querySelector('.hero .btn-primary');
+  if (heroCta) heroCta.addEventListener('click', function () { track('hero_cta_click'); });
+
+  // 4. Booking calendar CTA click
+  var bookingCta = document.querySelector('#contact .btn-primary');
+  if (bookingCta) bookingCta.addEventListener('click', function () { track('booking_cta_click'); });
+
+  // 5 + 6. Carousel skill view & sound — patch into the IIFE's updateUI via MutationObserver
+  var imgCards = document.querySelectorAll('.skills-img-card:not(.skills-img-clone)');
+  var lastActiveIndex = 0;
+  var carouselMutationObserver = new MutationObserver(function () {
+    imgCards.forEach(function (card, i) {
+      if (card.classList.contains('active') && i !== lastActiveIndex) {
+        lastActiveIndex = i;
+        var skillName = card.dataset.skill || String(i);
+        track('carousel_skill_view', { skill_name: skillName });
+      }
+    });
+  });
+  imgCards.forEach(function (card) {
+    carouselMutationObserver.observe(card, { attributes: true, attributeFilter: ['class'] });
+  });
+
+  var soundBtn = document.getElementById('skills-sound-btn');
+  if (soundBtn) {
+    soundBtn.addEventListener('click', function () {
+      var iconOn = soundBtn.querySelector('.skills-sound-icon--on');
+      if (iconOn && iconOn.style.display !== 'none') track('carousel_sound_enabled');
+    });
+  }
+
+  // 7. YouTube video thumbnail click
+  var ytFacade = document.querySelector('.yt-facade');
+  if (ytFacade) ytFacade.addEventListener('click', function () { track('play_youtube_video_click'); });
+
+  // 8. Social link clicks
+  document.querySelectorAll('.nav-menu a[href]').forEach(function (link) {
+    var href = link.getAttribute('href') || '';
+    var platform = href.includes('youtube.com') ? 'youtube' : href.includes('instagram.com') ? 'instagram' : null;
+    if (platform) link.addEventListener('click', function () { track('social_link_click', { platform: platform }); });
+  });
+
+  // 9. Contact link clicks
+  document.querySelectorAll('a[href^="mailto:"]').forEach(function (el) {
+    el.addEventListener('click', function () { track('contact_link_click', { method: 'email' }); });
+  });
+  document.querySelectorAll('a[href^="tel:"]').forEach(function (el) {
+    el.addEventListener('click', function () { track('contact_link_click', { method: 'phone' }); });
+  });
+})();
