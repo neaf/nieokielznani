@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Disallow: /generator.html
+
+Sitemap: https://nieokielznani.pl/sitemap.xml
