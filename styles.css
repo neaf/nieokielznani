@@ -516,34 +516,6 @@ section {
   margin-bottom: 0;
 }
 
-.guarantee-block {
-  padding: 1.75rem 2rem;
-  border: 1px solid var(--beige);
-  border-radius: 12px;
-  background: var(--cream);
-}
-
-.guarantee-block::before {
-  content: '★';
-  display: block;
-  font-size: 1.1rem;
-  color: var(--cta-color);
-  margin-bottom: 0.75rem;
-}
-
-.guarantee-block p {
-  font-family: var(--font-serif);
-  font-size: 1rem;
-  line-height: 1.8;
-  color: var(--text-color);
-  margin: 0 0 1rem;
-}
-
-.guarantee-block p:last-child {
-  margin-bottom: 0;
-}
-
-
 .program-stage.stage-media-block {
   display: grid;
   grid-template-columns: 1fr 0.5fr;
