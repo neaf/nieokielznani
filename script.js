@@ -281,3 +281,47 @@ console.log('Real Dog Training - Site loaded. If you\'re reading this, I hope yo
     el.addEventListener('click', function () { track('contact_link_click', { method: 'phone' }); });
   });
 })();
+
+// Hero polaroid stack: front card slides right, the rest slide left, then they swap layers
+(function () {
+  var stack = document.getElementById('polaroid-stack');
+  if (!stack) return;
+  var cards = Array.prototype.slice.call(stack.querySelectorAll('.polaroid'));
+  var order = cards.slice();
+  var busy = false;
+  var timer = null;
+  var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function render() {
+    order.forEach(function (card, i) { card.dataset.pos = i; });
+  }
+
+  function shuffle() {
+    if (busy) return;
+    busy = true;
+    order[0].classList.add('is-out-right');
+    order.slice(1).forEach(function (card) { card.classList.add('is-out-left'); });
+    setTimeout(function () {
+      order.push(order.shift());
+      cards.forEach(function (card) { card.classList.remove('is-out-right', 'is-out-left'); });
+      render();
+      setTimeout(function () { busy = false; }, 470);
+    }, reduced ? 20 : 300);
+  }
+
+  function start() {
+    if (reduced) return;
+    stop();
+    timer = setInterval(shuffle, 5000);
+  }
+  function stop() { clearInterval(timer); }
+
+  stack.addEventListener('click', function () { shuffle(); start(); });
+  stack.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); shuffle(); start(); }
+  });
+  stack.addEventListener('mouseenter', stop);
+  stack.addEventListener('mouseleave', start);
+  document.addEventListener('visibilitychange', function () { document.hidden ? stop() : start(); });
+  start();
+})();
